@@ -1,7 +1,7 @@
 // Required packages
+var cTable = require('console.table');
 var inquirer = require('inquirer');
 var mysql = require('mysql');
-
 var total = 0;
 
 // Create database connection
@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
     port: 3306,
     user: 'root',
     password: 'root',
-    database: 'bamazon'
+    database: 'node_records'
 });
 
 // Connect to database
@@ -18,7 +18,7 @@ connection.connect(function(err, res) {
     if (err) throw err;
     // console.log("connected as id " + connection.threadId);
 
-    console.log('\nWelcome to Bamazon');
+    console.log('\nWelcome to Node Records!');
     console.log('======================\n');
     inquirer
         .prompt(
@@ -52,7 +52,6 @@ function start() {
             itemString = 'ID: ' + result.item_id + '\tName: ' + result.product_name + ' -> $' + result.price;
             choicesArray.push(itemString);
         });
-        // console.log(choicesArray);
 
         // Ask user what/how much they want to purchase
         inquirer
