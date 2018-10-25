@@ -29,7 +29,7 @@ function start(){
                 type: 'list',
                 name: 'manager_task',
                 message: "What would you like to do?",
-                choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product']
+                choices: ['View Products for Sale', 'View Low Inventory', 'Add to Inventory', 'Add New Product', 'Exit']
             }
         ).then(function(answer){
             switch (answer.manager_task) {
@@ -146,6 +146,10 @@ function start(){
                             )
                         });
 
+                    break;
+
+                case ('Exit'):
+                    connection.end();
                     break;
 
             }

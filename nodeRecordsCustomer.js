@@ -91,14 +91,16 @@ function start() {
 
                     // if enough stock_quantity, update products db
                     var newQty = selectedItem.stock_quantity - parseInt(user_input.purchase_qty);
-                    var sql = "UPDATE products SET ? WHERE ? ";
-                    var inserts = [{ stock_quantity: newQty}, { item_id: selectedItem.item_id}];
+                    var salePrice = parseFloat(user_input.purchase_qty*selectedItem.price);
+                    var itemRev = parseFloat(selectedItem.product_sales);
+                    var sql = "UPDATE products SET ?, ? WHERE ? ";
+                    var inserts = [{ stock_quantity: newQty}, { product_sales: itemRev + salePrice }, { item_id: selectedItem.item_id}];
 
                     var query = connection.query( sql, inserts,
                         function(err, res) {
                             if (err) throw err;
 
-                            total += (user_input.purchase_qty*selectedItem.price);
+                            total += salePrice;
 
                             console.log('Thank you for your purchase!\nYour total is: $' + total);
                             inquirer
@@ -155,30 +157,36 @@ function start() {
                         ). then(function(answer){
                             switch (parseInt(answer.buy_option)) {
                                 case (0):       
-                                    var query = connection.query( "UPDATE products SET ? WHERE ? ", [{ stock_quantity: 0}, { item_id: selectedItem.item_id}],
+                                    var newQty = 0;
+                                    var salePrice = parseFloat(available_amt*selectedItem.price);
+                                    var itemRev = parseFloat(selectedItem.product_sales);
+                                    var sql = "UPDATE products SET ?, ? WHERE ? ";
+                                    var inserts = [{ stock_quantity: newQty}, { product_sales: itemRev + salePrice }, { item_id: selectedItem.item_id}];
+                
+                                    var query = connection.query( sql, inserts,
                                         function(err, res) {
                                             if (err) throw err;
 
-                                            total += available_amt*selectedItem.price;
-                                            console.log('Thank you for your purchase!\nYour total is: $' + total);
-                                            inquirer
-                                                .prompt(
-                                                    {
-                                                        type: 'confirm',
-                                                        name: 'continue_shopping',
-                                                        message: 'Would you like to continue shopping?',
-                                                        default: true
-                                                    }
-                                                ).then(function(answer){
-                                                    if (answer.continue_shopping) {
-                                                        start();
-                                                    } else {
-                                                        console.log('\nThanks for shopping at Bamazon!\nPlease mail your total of $' + total + ' plus tax (no we don\'t calculate that for you) to:\n\n55 Notarealroad Dr.\nBopeka, West Dakota 00000\n\nWe\'ll send you your items after. Have a great day');
-                                                        connection.end();
-                                                    }
-                                                });
-                                        }
-                                    );
+                                                total += salePrice;
+                                                console.log('Thank you for your purchase!\nYour total is: $' + total);
+                                                inquirer
+                                                    .prompt(
+                                                        {
+                                                            type: 'confirm',
+                                                            name: 'continue_shopping',
+                                                            message: 'Would you like to continue shopping?',
+                                                            default: true
+                                                        }
+                                                    ).then(function(answer){
+                                                        if (answer.continue_shopping) {
+                                                            start();
+                                                        } else {
+                                                            console.log('\nThanks for shopping at Bamazon!\nPlease mail your total of $' + total + ' plus tax (no we don\'t calculate that for you) to:\n\n55 Notarealroad Dr.\nBopeka, West Dakota 00000\n\nWe\'ll send you your items after. Have a great day');
+                                                            connection.end();
+                                                        }
+                                                    });
+                                            }
+                                        );
                                     break;
 
                                 case (1):
